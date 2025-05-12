@@ -413,6 +413,7 @@ def importFAO(db, params, pivot=False):
 
 
 def dictToCSV(myDict, fileName):
+    import csv
     with open(fileName, 'w', newline='', encoding='utf-8') as file:
         writer = csv.writer(file)
         writer.writerow(['Key', 'Value'])  # Optional: write header
@@ -567,39 +568,39 @@ def getDbInfo():
     return result
 
 
-def importWB(database_id, indicator_id, year_from, year_to):
-    url = (
-        f"https://data360api.worldbank.org/data360/data"
-        f"?DATABASE_ID={database_id}&INDICATOR={indicator_id}"
-        f"&timePeriodFrom={year_from}&timePeriodTo={year_to}&skip=0"
-    )
-    headers = {"accept": "application/json"}
+# def importWB(database_id, indicator_id, year_from, year_to):
+#     url = (
+#         f"https://data360api.worldbank.org/data360/data"
+#         f"?DATABASE_ID={database_id}&INDICATOR={indicator_id}"
+#         f"&timePeriodFrom={year_from}&timePeriodTo={year_to}&skip=0"
+#     )
+#     headers = {"accept": "application/json"}
 
-    try:
-        response = requests.get(url, headers=headers)
-        response.raise_for_status()  # Raise an HTTPError for bad responses (4xx and 5xx)
+#     try:
+#         response = requests.get(url, headers=headers)
+#         response.raise_for_status()  # Raise an HTTPError for bad responses (4xx and 5xx)
 
-        try:
-            data = response.json()
-        except ValueError:
-            print("Error: Unable to parse JSON response.")
-            return False
+#         try:
+#             data = response.json()
+#         except ValueError:
+#             print("Error: Unable to parse JSON response.")
+#             return False
 
-        # Check if the "value" key exists and contains data
-        if "value" in data and data["value"]:
-            try:
-                df = pd.DataFrame(data["value"])
-                return df
-            except Exception as e:
-                print(f"Error creating DataFrame: {e}")
-                return False
-        else:
-            print("No data available for the requested indicator and database.")
-            return False
+#         # Check if the "value" key exists and contains data
+#         if "value" in data and data["value"]:
+#             try:
+#                 df = pd.DataFrame(data["value"])
+#                 return df
+#             except Exception as e:
+#                 print(f"Error creating DataFrame: {e}")
+#                 return False
+#         else:
+#             print("No data available for the requested indicator and database.")
+#             return False
 
-    except requests.exceptions.RequestException as e:
-        print(f"HTTP Request failed: {e}")
-        return False
+#     except requests.exceptions.RequestException as e:
+#         print(f"HTTP Request failed: {e}")
+#         return False
 
 # example of function usage
 # mydf_ICTPolicy = importWB("ITU_ICT", "ITU_ICT_G5_DIG_ECON", "2000", "2025")
