@@ -1,13 +1,12 @@
 import os
+from pathlib import Path
+import tkinter as tk
+from tkinter import filedialog
 from functools import reduce
 import pandas as pd
 from pandas.io.stata import StataReader
 import fitz
-from pathlib import Path
-import tkinter as tk
-from tkinter import filedialog
 import faostat
-import requests
 
 
 stateNames1 = [
@@ -245,15 +244,30 @@ def importWB(database_id, indicator_id, year_from, year_to):
     )
     headers = {"accept": "application/json"}
 
-    response = requests.get(url, headers=headers)
-    data = response.json()
+    try:
+        response = requests.get(url, headers=headers)
+        response.raise_for_status()  # Raise an HTTPError for bad responses (4xx and 5xx)
 
-    # The data is under the "value" key
-    if "value" in data and data["value"]:
-        df = pd.DataFrame(data["value"])
-        return df
-    else:
-        print("No data available for the requested indicator and database.")
+        try:
+            data = response.json()
+        except ValueError:
+            print("Error: Unable to parse JSON response.")
+            return False
+
+        # Check if the "value" key exists and contains data
+        if "value" in data and data["value"]:
+            try:
+                df = pd.DataFrame(data["value"])
+                return df
+            except Exception as e:
+                print(f"Error creating DataFrame: {e}")
+                return False
+        else:
+            print("No data available for the requested indicator and database.")
+            return False
+
+    except requests.exceptions.RequestException as e:
+        print(f"HTTP Request failed: {e}")
         return False
 
 # example of function usage
@@ -561,15 +575,30 @@ def importWB(database_id, indicator_id, year_from, year_to):
     )
     headers = {"accept": "application/json"}
 
-    response = requests.get(url, headers=headers)
-    data = response.json()
+    try:
+        response = requests.get(url, headers=headers)
+        response.raise_for_status()  # Raise an HTTPError for bad responses (4xx and 5xx)
 
-    # The data is under the "value" key
-    if "value" in data and data["value"]:
-        df = pd.DataFrame(data["value"])
-        return df
-    else:
-        print("No data available for the requested indicator and database.")
+        try:
+            data = response.json()
+        except ValueError:
+            print("Error: Unable to parse JSON response.")
+            return False
+
+        # Check if the "value" key exists and contains data
+        if "value" in data and data["value"]:
+            try:
+                df = pd.DataFrame(data["value"])
+                return df
+            except Exception as e:
+                print(f"Error creating DataFrame: {e}")
+                return False
+        else:
+            print("No data available for the requested indicator and database.")
+            return False
+
+    except requests.exceptions.RequestException as e:
+        print(f"HTTP Request failed: {e}")
         return False
 
 # example of function usage
